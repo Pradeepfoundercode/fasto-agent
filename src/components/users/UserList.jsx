@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAgent } from '../../context/AgentContext';
 import { UserCard } from './UserCard';
 import { SearchIcon, XIcon, PlusIcon, UsersIcon } from '../icons/Icons';
 
 export function UserList() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     filteredUsers,
     referredUsers,
@@ -14,6 +16,35 @@ export function UserList() {
     stats,
     setIsAddUserOpen,
   } = useAgent();
+
+  // Sync URL search params with statusFilter
+  useEffect(() => {
+    const urlStatus = searchParams.get('status');
+    if (urlStatus && ['ALL', 'ORDER_PLACED', 'REGISTERED', 'PENDING'].includes(urlStatus)) {
+      if (statusFilter !== urlStatus) {
+        setStatusFilter(urlStatus);
+      }
+    }
+  }, [searchParams]);
+
+  const handleFilterClick = (tabId) => {
+    setStatusFilter(tabId);
+    if (tabId === 'ALL') {
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete('status');
+      setSearchParams(nextParams);
+    } else {
+      setSearchParams({ status: tabId });
+    }
+  };
+
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setStatusFilter('ALL');
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete('status');
+    setSearchParams(nextParams);
+  };
 
   const filterTabs = [
     { id: 'ALL', label: 'All', count: stats.totalReferred },
@@ -71,7 +102,7 @@ export function UserList() {
           return (
             <button
               key={tab.id}
-              onClick={() => setStatusFilter(tab.id)}
+              onClick={() => handleFilterClick(tab.id)}
               className={`flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all select-none ${
                 isActive
                   ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/20'
@@ -110,10 +141,7 @@ export function UserList() {
             </p>
             {(searchQuery || statusFilter !== 'ALL') && (
               <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setStatusFilter('ALL');
-                }}
+                onClick={handleResetFilters}
                 className="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-emerald-600 font-bold text-[11px] transition-colors"
               >
                 Reset Filters

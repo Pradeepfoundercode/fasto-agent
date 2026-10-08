@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useAgent } from '../../context/AgentContext';
 import { BoltIcon } from '../icons/Icons';
 
 export function AuthScreens() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const { login, register } = useAgent();
-  const [mode, setMode] = useState('login'); // 'login' or 'register'
+
+  const isRegister = location.pathname === '/register';
 
   // Login form state
   const [loginPhone, setLoginPhone] = useState('9876543210');
@@ -19,7 +23,10 @@ export function AuthScreens() {
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    login(loginPhone, loginPassword);
+    const success = login(loginPhone, loginPassword);
+    if (success) {
+      navigate('/');
+    }
   };
 
   const handleRegisterSubmit = (e) => {
@@ -28,18 +35,22 @@ export function AuthScreens() {
       alert('Please fill all required fields');
       return;
     }
-    register({
+    const success = register({
       name: regName,
       mobile: regMobile,
       password: regPassword,
       zone: regZone,
     });
+    if (success) {
+      navigate('/');
+    }
   };
 
   const handleQuickDemo = () => {
     setLoginPhone('9876543210');
     setLoginPassword('agent123');
     login('9876543210', 'agent123');
+    navigate('/');
   };
 
   return (
@@ -62,9 +73,10 @@ export function AuthScreens() {
       {/* Switch Tab Pills */}
       <div className="flex p-0.5 rounded-xl bg-slate-100 border border-slate-200 mb-3.5 shadow-2xs">
         <button
-          onClick={() => setMode('login')}
+          type="button"
+          onClick={() => navigate('/login')}
           className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
-            mode === 'login'
+            !isRegister
               ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/20'
               : 'text-slate-600 hover:text-slate-900'
           }`}
@@ -72,9 +84,10 @@ export function AuthScreens() {
           Agent Login
         </button>
         <button
-          onClick={() => setMode('register')}
+          type="button"
+          onClick={() => navigate('/register')}
           className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
-            mode === 'register'
+            isRegister
               ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/20'
               : 'text-slate-600 hover:text-slate-900'
           }`}
@@ -85,7 +98,7 @@ export function AuthScreens() {
 
       {/* Forms Card */}
       <div className="rounded-2xl bg-white border border-slate-200/90 p-4 shadow-sm">
-        {mode === 'login' ? (
+        {!isRegister ? (
           <form onSubmit={handleLoginSubmit} className="space-y-3">
             <div>
               <label className="block text-[11px] font-semibold text-slate-700 mb-1">

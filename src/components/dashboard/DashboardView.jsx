@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAgent } from '../../context/AgentContext';
 import { StatSummarySection } from './StatCard';
 import { ReferralCodeCard } from './ReferralCodeCard';
@@ -7,6 +8,7 @@ import { UserCard } from '../users/UserCard';
 import { ArrowRightIcon } from '../icons/Icons';
 
 export function DashboardView() {
+  const navigate = useNavigate();
   const { agent, referredUsers, setActiveTab, setStatusFilter } = useAgent();
 
   // Show 4 most recent referrals on main dashboard
@@ -57,8 +59,9 @@ export function DashboardView() {
           </div>
           <button
             onClick={() => {
-              setStatusFilter('ALL');
-              setActiveTab('users');
+              setStatusFilter?.('ALL');
+              setActiveTab?.('users');
+              navigate('/referrals');
             }}
             className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700 transition-colors"
           >

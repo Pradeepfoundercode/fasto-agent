@@ -1,13 +1,20 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAgent } from '../../context/AgentContext';
 import { UsersIcon, UserCheckIcon, BagCheckIcon, ClockIcon } from '../icons/Icons';
 
 export function StatSummarySection() {
+  const navigate = useNavigate();
   const { stats, setStatusFilter, setActiveTab } = useAgent();
 
   const handleCardClick = (filter) => {
     setStatusFilter(filter);
-    setActiveTab('users');
+    setActiveTab?.('users');
+    if (filter === 'ALL') {
+      navigate('/referrals');
+    } else {
+      navigate(`/referrals?status=${filter}`);
+    }
   };
 
   return (

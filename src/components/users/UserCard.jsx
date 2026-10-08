@@ -1,10 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAgent } from '../../context/AgentContext';
 import { StatusBadge } from '../common/Badge';
 import { ChevronRightIcon } from '../icons/Icons';
 
 export function UserCard({ user }) {
+  const navigate = useNavigate();
   const { setSelectedUser } = useAgent();
+
+  const handleCardClick = () => {
+    setSelectedUser?.(user);
+    navigate(`/referrals/${user.id}`);
+  };
 
   const getAvatarBg = (name) => {
     const colors = [
@@ -28,7 +35,7 @@ export function UserCard({ user }) {
 
   return (
     <div
-      onClick={() => setSelectedUser(user)}
+      onClick={handleCardClick}
       className="p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 shadow-2xs transition-all cursor-pointer flex items-center justify-between gap-2.5 group active:scale-98"
     >
       <div className="flex items-center gap-2.5 min-w-0">

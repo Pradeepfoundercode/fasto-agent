@@ -1,18 +1,20 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAgent } from '../../context/AgentContext';
 import { QRCodeSVG } from '../../utils/qrCodeGenerator';
 import { ArrowRightIcon } from '../icons/Icons';
 
 export function QRCodeCard() {
-  const { agent, setIsQRModalOpen } = useAgent();
+  const navigate = useNavigate();
+  const { agent } = useAgent();
 
   return (
     <div className="rounded-2xl bg-white border border-slate-200/90 p-2.5 flex items-center justify-between gap-3 shadow-2xs">
       {/* Mini QR Preview Thumbnail */}
       <div 
-        onClick={() => setIsQRModalOpen(true)}
+        onClick={() => navigate('/qr')}
         className="cursor-pointer group flex-shrink-0 relative active:scale-95 transition-transform"
-        title="Tap to expand QR"
+        title="Tap to view full QR"
       >
         <div className="p-1 rounded-xl bg-slate-50 border border-slate-200">
           <QRCodeSVG value={agent.referralLink} size={48} />
@@ -34,7 +36,7 @@ export function QRCodeCard() {
 
       {/* Action CTA */}
       <button
-        onClick={() => setIsQRModalOpen(true)}
+        onClick={() => navigate('/qr')}
         className="flex items-center gap-1 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-xs transition-all active:scale-95 shadow-sm shadow-emerald-500/20 flex-shrink-0"
       >
         <span>Show QR</span>

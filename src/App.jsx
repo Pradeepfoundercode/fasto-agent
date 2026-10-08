@@ -1,47 +1,64 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AgentProvider, useAgent } from './context/AgentContext';
 import { MobileContainer } from './components/layout/MobileContainer';
-import { Header } from './components/layout/Header';
-import { BottomNav } from './components/layout/BottomNav';
+import { AppLayout } from './components/layout/AppLayout';
 import { ToastContainer } from './components/common/Toast';
 import { AuthScreens } from './components/auth/AuthScreens';
 import { DashboardView } from './components/dashboard/DashboardView';
 import { UserList } from './components/users/UserList';
+import { UserDetailPage } from './components/users/UserDetailPage';
+import { QRView } from './components/dashboard/QRView';
 import { AdminSupportCard } from './components/admin/AdminSupportCard';
-import { QRModal } from './components/dashboard/QRModal';
-import { UserDetailModal } from './components/users/UserDetailModal';
-import { AddReferralModal } from './components/users/AddReferralModal';
 
-function MainAppContent() {
-  const { isAuthenticated, activeTab } = useAgent();
-
+function ProtectedLayout() {
+  const { isAuthenticated } = useAgent();
   if (!isAuthenticated) {
-    return <AuthScreens />;
+    return <Navigate to="/login" replace />;
   }
+  return <AppLayout />;
+}
 
+function PublicAuthRoute() {
+  const { isAuthenticated } = useAgent();
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+  return <AuthScreens />;
+}
+
+function AppRoutes() {
   return (
-    <>
-      <Header />
-      <main className="flex-1 px-3 py-2.5 overflow-y-auto">
-        {activeTab === 'dashboard' && <DashboardView />}
-        {activeTab === 'users' && <UserList />}
-        {activeTab === 'admin' && <AdminSupportCard />}
-      </main>
-      <BottomNav />
-      <QRModal />
-      <UserDetailModal />
-      <AddReferralModal />
-    </>
+    <Routes>
+      {/* Public Authentication Routes */}
+      <Route path="/login" element={<PublicAuthRoute />} />
+      <Route path="/register" element={<PublicAuthRoute />} />
+
+      {/* Protected Agent Portal Routes */}
+      <Route element={<ProtectedLayout />}>
+        <Route index element={<DashboardView />} />
+        <Route path="dashboard" element={<Navigate to="/" replace />} />
+        <Route path="referrals" element={<UserList />} />
+        <Route path="referrals/:id" element={<UserDetailPage />} />
+        <Route path="qr" element={<QRView />} />
+        <Route path="admin" element={<AdminSupportCard />} />
+      </Route>
+
+      {/* Catch-all Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
 export default function App() {
   return (
     <AgentProvider>
-      <MobileContainer>
-        <MainAppContent />
-      </MobileContainer>
-      <ToastContainer />
+      <BrowserRouter>
+        <MobileContainer>
+          <AppRoutes />
+        </MobileContainer>
+        <ToastContainer />
+      </BrowserRouter>
     </AgentProvider>
   );
 }
